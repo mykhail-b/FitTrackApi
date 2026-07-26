@@ -1,7 +1,5 @@
 using FitTrackApi.Core.Configurations;
 using FitTrackApi.Core.Entity;
-using FitTrackApi.Core.Extensions;
-using FitTrackApi.Server.Cqrs.Interfaces;
 using FitTrackApi.Server.Data;
 using FitTrackApi.Server.Services;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -82,10 +80,10 @@ builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection("SmtpCon
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
-builder.Services.AddHandlers(typeof(DataContext).Assembly);
-builder.Services.AddScoped<IQueryDispatcher, QueryDispatcher>();
-builder.Services.AddScoped<ICommandDispatcher, CommandDispatcher>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBodyMetricService, BodyMetricService>();
+builder.Services.AddScoped<IWorkoutService, WorkoutService>();
+builder.Services.AddScoped<IExerciseService, ExerciseService>();
 
 // ====================== PIPELINE ======================
 var app = builder.Build();

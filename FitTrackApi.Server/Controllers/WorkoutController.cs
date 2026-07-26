@@ -1,6 +1,5 @@
-﻿using FitTrackApi.Server.Cqrs.Handlers.WorkoutHandlers;
-using FitTrackApi.Server.Cqrs.Interfaces;
-using FitTrackApi.Core.Dto.Workout;
+﻿using FitTrackApi.Core.Dto.Workout;
+using FitTrackApi.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,13 +11,11 @@ namespace FitTrackApi.Server.Controllers;
 [ApiController]
 public class WorkoutController : ControllerBase
 {
-    private readonly IQueryDispatcher _queryDispatcher;
-    private readonly ICommandDispatcher _commandDispatcher;
+    private readonly IWorkoutService _workoutService;
 
-    public WorkoutController(IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher)
+    public WorkoutController(IWorkoutService workoutService)
     {
-        _queryDispatcher = queryDispatcher;
-        _commandDispatcher = commandDispatcher;
+        _workoutService = workoutService;
     }
 
     private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -27,8 +24,7 @@ public class WorkoutController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<WorkoutDto>>> GetAllUserWorkouts(CancellationToken cancellationToken)
     {
-        var query = new GetAllUserWorkoutsQuery(CurrentUserId);
-        var result = await _queryDispatcher.Dispatch<GetAllUserWorkoutsQuery, List<WorkoutDto>>(query, cancellationToken);
+        var result = await _workoutService.GetAllForUserAsync(CurrentUserId, cancellationToken);
         return Ok(result);
     }
 
@@ -36,8 +32,7 @@ public class WorkoutController : ControllerBase
     [HttpGet("{workoutId:guid}")]
     public async Task<ActionResult<WorkoutDto>> GetUserWorkoutById(Guid workoutId, CancellationToken cancellationToken)
     {
-        var query = new GetWorkoutByIdQuery(workoutId);
-        var result = await _queryDispatcher.Dispatch<GetWorkoutByIdQuery, WorkoutDto?>(query, cancellationToken);
+        var result = await _workoutService.GetByIdAsync(workoutId, cancellationToken);
 
         if (result is null)
             return NotFound();
@@ -49,9 +44,7 @@ public class WorkoutController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateWorkout([FromBody] WorkoutDto workout, CancellationToken cancellationToken)
     {
-        var command = new CreateWorkoutCommand(CurrentUserId, workout.Date, workout.Notes, workout.Exercises);
-        var result = await _commandDispatcher.Dispatch<CreateWorkoutCommand, bool>(command, cancellationToken);
-
+        var result = await _workoutService.CreateAsync(CurrentUserId, workout.Date, workout.Notes, workout.Exercises, cancellationToken);
         return result ? Ok() : BadRequest();
     }
 
@@ -59,9 +52,7 @@ public class WorkoutController : ControllerBase
     [HttpPut("{workoutId:guid}")]
     public async Task<ActionResult> UpdateWorkout(Guid workoutId, [FromBody] WorkoutDto updatedWorkout, CancellationToken cancellationToken)
     {
-        var command = new UpdateWorkoutCommand(workoutId, updatedWorkout.Date, updatedWorkout.Notes, updatedWorkout.Exercises);
-        var result = await _commandDispatcher.Dispatch<UpdateWorkoutCommand, bool>(command, cancellationToken);
-
+        var result = await _workoutService.UpdateAsync(workoutId, updatedWorkout.Date, updatedWorkout.Notes, updatedWorkout.Exercises, cancellationToken);
         return result ? Ok() : NotFound();
     }
 
@@ -69,9 +60,7 @@ public class WorkoutController : ControllerBase
     [HttpDelete("{workoutId:guid}")]
     public async Task<ActionResult> DeleteWorkout(Guid workoutId, CancellationToken cancellationToken)
     {
-        var command = new RemoveWorkoutCommand(workoutId);
-        var result = await _commandDispatcher.Dispatch<RemoveWorkoutCommand, bool>(command, cancellationToken);
-
+        var result = await _workoutService.RemoveAsync(workoutId, cancellationToken);
         return result ? Ok() : NotFound();
     }
 }

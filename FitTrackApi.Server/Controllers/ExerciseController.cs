@@ -1,6 +1,5 @@
 ﻿using FitTrackApi.Core.Dto.Exercise;
-using FitTrackApi.Server.Cqrs.Handlers.ExerciseHandlers;
-using FitTrackApi.Server.Cqrs.Interfaces;
+using FitTrackApi.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,40 +10,34 @@ namespace FitTrackApi.Server.Controllers;
 [ApiController]
 public class ExerciseController : ControllerBase
 {
-    private readonly IQueryDispatcher _queryDispatcher;
+    private readonly IExerciseService _exerciseService;
 
-    public ExerciseController(IQueryDispatcher queryDispatcher)
+    public ExerciseController(IExerciseService exerciseService)
     {
-        _queryDispatcher = queryDispatcher;
+        _exerciseService = exerciseService;
     }
 
-    //GET
+    // GET
     [HttpGet]
     public async Task<ActionResult<PagedListResult<ExerciseListItemResult>>> GetAllExercises(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetExercisesPagedQuery(pageNumber, pageSize);
-
-        var result = await _queryDispatcher.Dispatch<GetExercisesPagedQuery, PagedListResult<ExerciseListItemResult>>(query, cancellationToken);
-
+        var result = await _exerciseService.GetPagedAsync(pageNumber, pageSize, cancellationToken);
         return Ok(result);
     }
 
-    //GET{ID}
+    // GET {id}
     [HttpGet("{exerciseId}")]
     public async Task<ActionResult<ExerciseDetailsResult>> GetExerciseById(
         [FromRoute] int exerciseId,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetExerciseByIdQuery(exerciseId);
-        var exercise = await _queryDispatcher.Dispatch<GetExerciseByIdQuery, ExerciseDetailsResult?>(query, cancellationToken);
+        var exercise = await _exerciseService.GetByIdAsync(exerciseId, cancellationToken);
 
-        if (exercise == null)
-        {
-            return NotFound(new { Message = $"Exercise with ID {exerciseId} not founded." });
-        }
+        if (exercise is null)
+            return NotFound(new { Message = $"Exercise with ID {exerciseId} not found." });
 
         return Ok(exercise);
     }
