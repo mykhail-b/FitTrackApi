@@ -37,7 +37,7 @@ builder.Services.AddCors(options =>
 
 // EF Core + Identity
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDbConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddIdentity<UserAccount, IdentityRole>(options =>
 {
@@ -78,7 +78,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection("TestSmtpConfiguration"));
+builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection("SmtpConfiguration"));
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
