@@ -1,5 +1,4 @@
 ﻿using FitTrackApi.Core.Dto.Workout;
-using FitTrackApi.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -7,7 +6,7 @@ using System.Security.Claims;
 namespace FitTrackApi.Server.Controllers;
 
 [Authorize]
-[Route("api/workout")]
+[Route("api/v1/workout")]
 [ApiController]
 public class WorkoutController : ControllerBase
 {
@@ -44,16 +43,29 @@ public class WorkoutController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateWorkout([FromBody] WorkoutDto workout, CancellationToken cancellationToken)
     {
-        var result = await _workoutService.CreateAsync(CurrentUserId, workout.Date, workout.Notes, workout.Exercises, cancellationToken);
-        return result ? Ok() : BadRequest();
+        await _workoutService.CreateAsync(CurrentUserId, workout.Date, workout.Notes, workout.Exercises, cancellationToken);
+        return Ok();
     }
 
     // PUT api/workout/{workoutId}
     [HttpPut("{workoutId:guid}")]
-    public async Task<ActionResult> UpdateWorkout(Guid workoutId, [FromBody] WorkoutDto updatedWorkout, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateWorkout(Guid workoutId, WorkoutDto updatedWorkout, CancellationToken ct)
     {
-        var result = await _workoutService.UpdateAsync(workoutId, updatedWorkout.Date, updatedWorkout.Notes, updatedWorkout.Exercises, cancellationToken);
-        return result ? Ok() : NotFound();
+        await _workoutService.UpdateAsync(
+            workoutId,
+            updatedWorkout.Date,
+            updatedWorkout.Notes,
+            updatedWorkout.Exercises,
+            ct);
+
+        return NoContent();
+    }
+
+    [HttpGet("activity")]
+    public async Task<ActionResult<List<DateOnly>>> GetWorkoutActivity(CancellationToken cancellationToken)
+    {
+        var result = await _workoutService.GetWorkoutActivity(CurrentUserId, cancellationToken);
+        return Ok(result);
     }
 
     // DELETE api/workout/{workoutId}

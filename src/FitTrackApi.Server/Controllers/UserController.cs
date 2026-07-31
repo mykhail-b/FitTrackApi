@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 [Authorize]
-[Route("api/user")]
+[Route("api/v1/user")]
 [ApiController]
 public class UserController : ControllerBase
 {

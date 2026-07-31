@@ -8,9 +8,10 @@ public interface IWorkoutService
 {
     Task<WorkoutDto?> GetByIdAsync(Guid workoutId, CancellationToken ct = default);
     Task<List<WorkoutDto>> GetAllForUserAsync(string userId, CancellationToken ct = default);
-    Task<bool> CreateAsync(string userId, DateTime date, string? notes, List<WorkoutExerciseDto> exercises, CancellationToken ct = default);
-    Task<bool> UpdateAsync(Guid workoutId, DateTime date, string? notes, List<WorkoutExerciseDto> exercises, CancellationToken ct = default);
-    Task<bool> RemoveAsync(Guid workoutId, CancellationToken ct = default);
+    Task CreateAsync(string userId, DateTime date, string? notes, List<WorkoutExerciseDto> exercises, CancellationToken ct = default);
+    Task UpdateAsync(Guid workoutId, DateTime date, string? notes, List<WorkoutExerciseDto> exercises, CancellationToken ct = default);
+    Task <List<DateOnly>>GetWorkoutActivity(string userId, CancellationToken ct = default);
+    Task <bool> RemoveAsync(Guid workoutId, CancellationToken ct = default);
 }
 
 public class WorkoutService : IWorkoutService
@@ -18,6 +19,11 @@ public class WorkoutService : IWorkoutService
     private readonly DataContext _dbContext;
     public WorkoutService(DataContext dbContext) => _dbContext = dbContext;
 
+    /// <summary>
+    /// Mapper delegate to convert Workout entity to WorkoutDto
+    /// </summary>
+    /// <param name="w"></param>
+    /// <returns></returns>
     private static WorkoutDto ToDto(Workout w) => new()
     {
         Id = w.Id,
@@ -53,17 +59,16 @@ public class WorkoutService : IWorkoutService
         return workouts.Select(ToDto).ToList();
     }
 
-    public async Task<bool> CreateAsync(string userId, DateTime date, string? notes, List<WorkoutExerciseDto> exercises, CancellationToken ct = default)
+    public async Task CreateAsync(string userId, DateTime date, string? notes, List<WorkoutExerciseDto> exercises, CancellationToken ct = default)
     {
         var workout = new Workout { Id = Guid.NewGuid(), UserId = userId, Date = date, Notes = notes };
         workout.Exercises = WorkoutExerciseFactory.BuildFrom(workout.Id, workout, exercises);
 
         _dbContext.Workouts.Add(workout);
-        var affected = await _dbContext.SaveChangesAsync(ct);
-        return affected > 0;
+        await _dbContext.SaveChangesAsync(ct);
     }
 
-    public async Task<bool> UpdateAsync(Guid workoutId, DateTime date, string? notes, List<WorkoutExerciseDto> exercises, CancellationToken ct = default)
+    public async Task UpdateAsync(Guid workoutId, DateTime date, string? notes, List<WorkoutExerciseDto> exercises, CancellationToken ct = default)
     {
         var workout = await _dbContext.Workouts
             .Include(w => w.Exercises)
@@ -77,17 +82,31 @@ public class WorkoutService : IWorkoutService
         workout.Exercises.Clear();
         workout.Exercises = WorkoutExerciseFactory.BuildFrom(workout.Id, workout, exercises);
 
-        var affected = await _dbContext.SaveChangesAsync(ct);
-        return affected > 0;
+        await _dbContext.SaveChangesAsync(ct);
     }
 
-    public async Task<bool> RemoveAsync(Guid workoutId, CancellationToken ct = default)
+    public async Task<List<DateOnly>> GetWorkoutActivity(string userId, CancellationToken ct = default)
+    {
+        var activeDays = await _dbContext.Workouts
+            .AsNoTracking()
+            .Where(w => w.UserId == userId)
+            .Select(w => DateOnly.FromDateTime(w.Date))
+            .Distinct()
+            .OrderBy(d => d)
+            .ToListAsync(ct);
+
+        return activeDays;
+    }
+
+    public async Task <bool> RemoveAsync(Guid workoutId, CancellationToken ct = default)
     {
         var workout = await _dbContext.Workouts.FirstOrDefaultAsync(w => w.Id == workoutId, ct);
-        if (workout is null) return false;
+        if (workout is null)
+            return false;
 
         _dbContext.Workouts.Remove(workout);
-        var affected = await _dbContext.SaveChangesAsync(ct);
-        return affected > 0;
+        await _dbContext.SaveChangesAsync(ct);
+
+        return true;
     }
 }

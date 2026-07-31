@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FitTrackApi.Server.Controllers;
 
 [Authorize]
-[Route("api/body-metrics")]
+[Route("api/v1/body-metrics")]
 [ApiController]
 public class BodyMetricsController : ControllerBase
 {
