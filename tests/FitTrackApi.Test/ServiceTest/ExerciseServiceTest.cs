@@ -1,4 +1,5 @@
-﻿using FitTrackApi.Core.Entity;
+﻿using FitTrackApi.Infrastructure.Entity;
+using FitTrackApi.Infrastructure.Services;
 using FitTrackApi.Test.Configuration;
 
 namespace FitTrackApi.Test.ServiceTest;

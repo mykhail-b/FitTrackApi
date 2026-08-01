@@ -1,4 +1,4 @@
-using FitTrackApi.Server.Data;
+using FitTrackApi.Infrastructure.Data;
 
 namespace FitTrackApi.Test.Configuration;
 

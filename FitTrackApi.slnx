@@ -1,12 +1,14 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/FitTrackApi.Core/FitTrackApi.Core.csproj" />
+    <Project Path="src/FitTrackApi.Application/FitTrackApi.Application.csproj" Id="b9791f61-d0a3-4418-bc6f-d03b6965b4e6" />
+    <Project Path="src/FitTrackApi.Domain/FitTrackApi.Domain.csproj" Id="d64043a4-8eca-4977-af38-8ccc4490a672" />
+    <Project Path="src/FitTrackApi.Infrastructure/FitTrackApi.Infrastructure.csproj" Id="44b53c2b-c659-452a-8eea-5c1804cdad74" />
     <Project Path="src/FitTrackApi.Server/FitTrackApi.Server.csproj" />
   </Folder>
 
   <Folder Name="/tests/">
-    <Project Path="tests/FitTrackApi.Test/FitTrackApi.Test.csproj" />
     <Project Path="tests/FitTrack.PlaywrightTests/FitTrack.PlaywrightTests.csproj" />
+    <Project Path="tests/FitTrackApi.Test/FitTrackApi.Test.csproj" />
   </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />

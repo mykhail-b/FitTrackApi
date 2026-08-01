@@ -1,4 +1,4 @@
-using FitTrackApi.Server.Data;
+using FitTrackApi.Infrastructure.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Respawn;

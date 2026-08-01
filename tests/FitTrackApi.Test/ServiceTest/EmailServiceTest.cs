@@ -1,5 +1,5 @@
-﻿using FitTrackApi.Core.Configurations;
-using FitTrackApi.Server.Services;
+﻿using FitTrackApi.Infrastructure.Configurations;
+using FitTrackApi.Infrastructure.Services;
 using Microsoft.Extensions.Options;
 using System.Net.Sockets;
 
@@ -10,7 +10,7 @@ public class EmailServiceTest
     [Fact]
     public async Task SendEmail_Should_ThrowOrComplete_WhenSmtpUnavailable()
     {
-        var settings = new SmtpConfig
+        var settings = new SmtpConfiguration
         {
             Host = "localhost",
             Port = 1025,

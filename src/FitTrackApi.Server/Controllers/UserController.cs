@@ -1,4 +1,5 @@
-﻿using FitTrackApi.Core.Dto.User;
+﻿using FitTrackApi.Application.Dto.User;
+using FitTrackApi.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

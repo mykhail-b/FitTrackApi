@@ -1,6 +1,6 @@
-﻿using FitTrackApi.Core.Dto.User;
-using FitTrackApi.Core.Entity;
-using FitTrackApi.Server.Services;
+﻿using FitTrackApi.Application.Dto.User;
+using FitTrackApi.Infrastructure.Entity;
+using FitTrackApi.Infrastructure.Services;
 using FitTrackApi.Test.Configuration;
 
 namespace FitTrackApi.Test.ServiceTest;
