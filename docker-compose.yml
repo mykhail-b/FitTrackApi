@@ -1,0 +1,24 @@
+services:
+  fittrackapi.server:
+    image: ${DOCKER_REGISTRY-}fittrackapiserver
+    build:
+      context: .
+      dockerfile: src/FitTrackApi.Server/Dockerfile
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=FitTrackDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Express
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+volumes:
+  mssql_data:

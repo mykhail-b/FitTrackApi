@@ -28,14 +28,13 @@ public class WorkoutServiceTest(DatabaseFixture fixture) : IntegrationTestBase(f
         await CreateTestUserAsync();
         var service = new WorkoutService(DbContext);
 
-        var result = await service.CreateAsync(
+        await service.CreateAsync(
             "test-user-id",
             DateTime.UtcNow,
             "Leg day",
             new List<WorkoutExerciseDto>(),
             CancellationToken.None);
 
-        Assert.True(result);
         Assert.Single(DbContext.Workouts);
     }
 
@@ -54,14 +53,13 @@ public class WorkoutServiceTest(DatabaseFixture fixture) : IntegrationTestBase(f
 
         var workout = DbContext.Workouts.First();
 
-        var result = await service.UpdateAsync(
+        await service.UpdateAsync(
             workout.Id,
             DateTime.UtcNow,
             "Updated",
             new List<WorkoutExerciseDto>(),
             CancellationToken.None);
 
-        Assert.True(result);
         Assert.Equal("Updated", DbContext.Workouts.First().Notes);
     }
 

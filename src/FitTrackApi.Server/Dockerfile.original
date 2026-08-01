@@ -12,11 +12,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/FitTrackApi.Server/FitTrackApi.Server.csproj", "src/FitTrackApi.Server/"]
-COPY ["src/FitTrackApi.Core/FitTrackApi.Core.csproj", "src/FitTrackApi.Core/"]
-RUN dotnet restore "./src/FitTrackApi.Server/FitTrackApi.Server.csproj"
+COPY ["FitTrackApi.Server/FitTrackApi.Server.csproj", "FitTrackApi.Server/"]
+RUN dotnet restore "./FitTrackApi.Server/FitTrackApi.Server.csproj"
 COPY . .
-WORKDIR "/src/src/FitTrackApi.Server"
+WORKDIR "/src/FitTrackApi.Server"
 RUN dotnet build "./FitTrackApi.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage

@@ -17,7 +17,6 @@ public class DataContext : IdentityDbContext<UserAccount>
     public DbSet<Exercise> Exercises { get; set; }
     public DbSet<Workout> Workouts { get; set; }
     public DbSet<BodyMetric> BodyMetrics { get; set; }
-    public DbSet<NutritionLog> NutritionLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -8,4 +8,7 @@
     <Project Path="tests/FitTrackApi.Test/FitTrackApi.Test.csproj" />
     <Project Path="tests/FitTrack.PlaywrightTests/FitTrack.PlaywrightTests.csproj" />
   </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
 </Solution>

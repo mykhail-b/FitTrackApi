@@ -13,11 +13,12 @@ A RESTful API for tracking workouts, exercises, and body metrics
 
 ## 💡 Motivation
 
-I built FitTrack to showcase backend development with .NET — my favorite area of software engineering. I've started several side projects before, but often abandoned them once the scope grew too large to finish. This time, I deliberately kept the project focused: a single, well-defined domain with clear business rules, built end-to-end rather than left half-done.
+I built FitTrack to improve my backend development skills with .NET and to have a project that reflects the kind of software I enjoy building.
 
-I'm also into fitness myself, which made this domain a natural fit — workout tracking, 
-calorie calculations, and body metrics involve just enough real-world logic (BMR/TDEE formulas, nutrient tracking, workout history) to be genuinely interesting to model, 
-without ballooning into something unmanageable.
+In the past, I started several side projects but made them too ambitious and never finished them. With FitTrack, I decided to keep the scope focused and build a complete application instead of constantly adding new features.
+
+Fitness was a natural choice because it involves real business logic, such as workout history and body metrics, while keeping the project manageable.
+
 
 
 ## 🔨 Tech Stack
@@ -25,8 +26,10 @@ without ballooning into something unmanageable.
 * **Backend:** ASP.NET Core Web API
 * **Database:** Microsoft SQL Server
 * **ORM:** Entity Framework Core
-* **Auth:** ASP.NET Core Identity
-* **API Documentation:** Swagger
+* **Authentication:** ASP.NET Core Identity
+* **Authorization:** Cookie Authentication (HttpOnly Cookies)
+* **API Documentation:** Scalar
+* **Deployment:** Docker
 
 ## Architecture
 
@@ -38,27 +41,14 @@ The solution is split into three projects:
 
 ### Server-side architecture
 
-`FitTrackApi.Server` follows a **Controller + Service** architecture:
+`FitTrackApi.Server` is built as a layered monolithic application.
 
-Controller → Service → EF Core DbContext → SQL Server
-
-Controllers are kept thin — they handle HTTP concerns only (routing, model binding, 
-status codes) and delegate all business logic to services. Each domain (Users, 
-Workouts, Exercises, Body Metrics) has its own service and interface, registered 
-via dependency injection.
-
-An earlier iteration used a CQRS-style command/query dispatcher, but for this 
-project's CRUD-focused scope it added unnecessary indirection without real benefit — 
-refactored to the simpler Controller → Service flow above.
+Controllers are responsible for handling HTTP requests and responses, while business logic is implemented in dedicated services. Data access is handled through Entity Framework Core using `DataContext`, which serves as the application's data access layer. Dependencies are managed using ASP.NET Core's built-in dependency injection.
 
 ### Authentication
 
-Authentication uses **HttpOnly cookies** via ASP.NET Core Identity, rather than 
-JWTs stored client-side. Since the cookie is inaccessible to JavaScript, it 
-significantly reduces the risk of token theft via XSS — the browser attaches it 
-automatically on each request, and the client never handles the token directly. 
-Protected endpoints are guarded with `[Authorize]`, and the current user's id is 
-read from `ClaimTypes.NameIdentifier`.
+Authentication is implemented with **ASP.NET Core Identity** using **HttpOnly authentication cookies**. After a successful sign-in, the browser automatically includes the authentication cookie with subsequent requests, so the client does not need to manage authentication tokens manually. Protected endpoints are secured with the `[Authorize]` attribute, and the authenticated user's identifier is retrieved from `ClaimTypes.NameIdentifier`.
+
 
 ## API Endpoints
 
@@ -89,6 +79,7 @@ read from `ClaimTypes.NameIdentifier`.
 |--------|----------|--------------|
 | GET | `/api/workout` | Get all workouts for current user |
 | GET | `/api/workout/{workoutId}` | Get a specific workout |
+| GET | `/api/workout/activity` | Get a user workout activity date list |
 | POST | `/api/workout` | Create a new workout |
 | PUT | `/api/workout/{workoutId}` | Update a workout |
 | DELETE | `/api/workout/{workoutId}` | Delete a workout |
@@ -99,7 +90,7 @@ read from `ClaimTypes.NameIdentifier`.
 | GET | `/api/exercise?pageNumber=1&pageSize=10` | Get paged list of exercises |
 | GET | `/api/exercise/{exerciseId}` | Get exercise details |
 
-Full interactive documentation is available via Swagger UI at `/swagger` in Development.
+Full interactive documentation is available via Scalar UI.
 
 ## 🚀 Getting started 
 ### Prerequisites
@@ -133,7 +124,7 @@ Full interactive documentation is available via Swagger UI at `/swagger` in Deve
    > dotnet run
    ```
 
-5. Open Swagger UI at `https://localhost:7114/swagger`
+5. Open Scalar UI at `https://localhost:7114/scalar/v1`
 
 ### Running tests
 ```bash
@@ -142,13 +133,3 @@ Full interactive documentation is available via Swagger UI at `/swagger` in Deve
 ```
 Integration tests spin up a real SQL Server instance in Docker via Testcontainers — 
 make sure Docker is running before executing them.
-
-## ✍️ Lessons Learned
-
-- Refactored from CQRS-style dispatchers to a simpler Controller → Service 
-  architecture once it became clear the indirection wasn't paying for itself 
-  in a CRUD-focused project
-- Learned proper environment-based configuration (User Secrets, env vars) 
-  instead of hardcoding connection strings
-- First time using Testcontainers for integration tests instead of mocking 
-  the database entirely

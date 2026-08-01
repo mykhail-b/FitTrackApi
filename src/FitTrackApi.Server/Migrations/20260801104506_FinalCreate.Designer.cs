@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FitTrackApi.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260729175206_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260801104506_FinalCreate")]
+    partial class FinalCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
