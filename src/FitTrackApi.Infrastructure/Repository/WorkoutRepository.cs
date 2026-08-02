@@ -10,20 +10,11 @@ public class WorkoutRepository : Repository<Workout, Guid>, IWorkoutRepository
 {
     public WorkoutRepository(DataContext context) : base(context) { }
 
-    public async Task AddAsync(Workout entity, CancellationToken ct = default)
-        => await DbSet.AddAsync(entity, ct);
-
-    public async Task<IReadOnlyList<Workout>> GetAllAsync(CancellationToken ct = default)
-        => await DbSet.AsNoTracking().ToListAsync(ct);
-
     public async Task<IReadOnlyList<Workout>> GetAllForUserAsync(string userId, CancellationToken ct = default)
         => await DbSet.AsNoTracking()
             .Where(w => w.UserId == userId)
             .OrderByDescending(w => w.Date)
             .ToListAsync(ct);
-
-    public async Task<Workout?> GetByIdAsync(Guid id, CancellationToken ct = default)
-        => await DbSet.FindAsync(new object[] { id }, ct);
 
     public async Task<Workout?> GetByIdWithExercisesAsync(Guid id, CancellationToken ct = default)
         => await DbSet
@@ -45,8 +36,6 @@ public class WorkoutRepository : Repository<Workout, Guid>, IWorkoutRepository
             .ToList();
     }
 
-    public void Remove(Workout entity) => DbSet.Remove(entity);
-
     public async Task ReplaceExercisesAsync(Workout workout, ICollection<WorkoutExercise> newExercises, CancellationToken ct = default)
     {
         // Remove existing exercises for the workout
@@ -64,6 +53,4 @@ public class WorkoutRepository : Repository<Workout, Guid>, IWorkoutRepository
 
         await Task.CompletedTask;
     }
-
-    public void Update(Workout entity) => DbSet.Update(entity);
 }
