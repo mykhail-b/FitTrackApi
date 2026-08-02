@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FitTrackApi.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260801161720_InitialCreate")]
+    [Migration("20260802113323_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace FitTrackApi.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("FitTrackApi.Infrastructure.Entity.BodyMetric", b =>
+            modelBuilder.Entity("FitTrackApi.Domain.Entity.BodyMetric", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,9 +39,6 @@ namespace FitTrackApi.Infrastructure.Migrations
 
                     b.Property<double>("CarbsGrams")
                         .HasColumnType("float");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<double>("DailyCalories")
                         .HasColumnType("float");
@@ -76,12 +73,12 @@ namespace FitTrackApi.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "UpdatedAt");
 
                     b.ToTable("BodyMetrics");
                 });
 
-            modelBuilder.Entity("FitTrackApi.Infrastructure.Entity.Exercise", b =>
+            modelBuilder.Entity("FitTrackApi.Domain.Entity.Exercise", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,19 +88,19 @@ namespace FitTrackApi.Infrastructure.Migrations
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedByUserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Equipment")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Force")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Images")
                         .IsRequired()
@@ -113,23 +110,24 @@ namespace FitTrackApi.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsSystem")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Level")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("MeasurabilityType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Mechanic")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("PrimaryMuscles")
                         .IsRequired()
@@ -141,10 +139,67 @@ namespace FitTrackApi.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name");
+
                     b.ToTable("Exercises");
                 });
 
-            modelBuilder.Entity("FitTrackApi.Infrastructure.Entity.UserAccount", b =>
+            modelBuilder.Entity("FitTrackApi.Domain.Entity.Workout", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Date");
+
+                    b.ToTable("Workouts");
+                });
+
+            modelBuilder.Entity("FitTrackApi.Domain.Entity.WorkoutExercise", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ExerciseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Reps")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Sets")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Weight")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<Guid>("WorkoutId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.HasIndex("WorkoutId");
+
+                    b.ToTable("WorkoutExercise");
+                });
+
+            modelBuilder.Entity("FitTrackApi.Infrastructure.IdentityEntity.UserAccount", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -211,60 +266,6 @@ namespace FitTrackApi.Infrastructure.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("FitTrackApi.Infrastructure.Entity.Workout", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Workouts");
-                });
-
-            modelBuilder.Entity("FitTrackApi.Infrastructure.Entity.WorkoutExercise", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Reps")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Sets")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Weight")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<Guid>("WorkoutId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExerciseId");
-
-                    b.HasIndex("WorkoutId");
-
-                    b.ToTable("WorkoutExercise");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -400,37 +401,33 @@ namespace FitTrackApi.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("FitTrackApi.Infrastructure.Entity.BodyMetric", b =>
+            modelBuilder.Entity("FitTrackApi.Domain.Entity.BodyMetric", b =>
                 {
-                    b.HasOne("FitTrackApi.Infrastructure.Entity.UserAccount", "User")
+                    b.HasOne("FitTrackApi.Infrastructure.IdentityEntity.UserAccount", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FitTrackApi.Infrastructure.Entity.Workout", b =>
+            modelBuilder.Entity("FitTrackApi.Domain.Entity.Workout", b =>
                 {
-                    b.HasOne("FitTrackApi.Infrastructure.Entity.UserAccount", "User")
+                    b.HasOne("FitTrackApi.Infrastructure.IdentityEntity.UserAccount", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FitTrackApi.Infrastructure.Entity.WorkoutExercise", b =>
+            modelBuilder.Entity("FitTrackApi.Domain.Entity.WorkoutExercise", b =>
                 {
-                    b.HasOne("FitTrackApi.Infrastructure.Entity.Exercise", "Exercise")
+                    b.HasOne("FitTrackApi.Domain.Entity.Exercise", "Exercise")
                         .WithMany()
                         .HasForeignKey("ExerciseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("FitTrackApi.Infrastructure.Entity.Workout", "Workout")
+                    b.HasOne("FitTrackApi.Domain.Entity.Workout", "Workout")
                         .WithMany("Exercises")
                         .HasForeignKey("WorkoutId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -452,7 +449,7 @@ namespace FitTrackApi.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("FitTrackApi.Infrastructure.Entity.UserAccount", null)
+                    b.HasOne("FitTrackApi.Infrastructure.IdentityEntity.UserAccount", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -461,7 +458,7 @@ namespace FitTrackApi.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("FitTrackApi.Infrastructure.Entity.UserAccount", null)
+                    b.HasOne("FitTrackApi.Infrastructure.IdentityEntity.UserAccount", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -476,7 +473,7 @@ namespace FitTrackApi.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FitTrackApi.Infrastructure.Entity.UserAccount", null)
+                    b.HasOne("FitTrackApi.Infrastructure.IdentityEntity.UserAccount", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -485,14 +482,14 @@ namespace FitTrackApi.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("FitTrackApi.Infrastructure.Entity.UserAccount", null)
+                    b.HasOne("FitTrackApi.Infrastructure.IdentityEntity.UserAccount", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FitTrackApi.Infrastructure.Entity.Workout", b =>
+            modelBuilder.Entity("FitTrackApi.Domain.Entity.Workout", b =>
                 {
                     b.Navigation("Exercises");
                 });

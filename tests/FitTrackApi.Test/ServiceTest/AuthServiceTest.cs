@@ -1,6 +1,6 @@
 ﻿using FitTrackApi.Application.Dto;
 using FitTrackApi.Infrastructure.Data;
-using FitTrackApi.Infrastructure.Entity;
+using FitTrackApi.Infrastructure.IdentityEntity;
 using FitTrackApi.Infrastructure.Services;
 using FitTrackApi.Test.Configuration;
 using Microsoft.AspNetCore.Identity;

@@ -1,6 +1,6 @@
 ﻿using FitTrackApi.Application.Dto;
-using FitTrackApi.Infrastructure.Entity;
-using FitTrackApi.Infrastructure.Services;
+using FitTrackApi.Application.Services;
+using FitTrackApi.Infrastructure.IdentityEntity;
 using FitTrackApi.Test.Configuration;
 
 namespace FitTrackApi.Test.ServiceTest;
@@ -26,7 +26,7 @@ public class WorkoutServiceTest(DatabaseFixture fixture) : IntegrationTestBase(f
     public async Task CreateAsync_Should_CreateWorkout_WhenDataIsValid()
     {
         await CreateTestUserAsync();
-        var service = new WorkoutService(DbContext);
+        var service = new WorkoutService(UnitOfWork);
 
         await service.CreateAsync(
             "test-user-id",
@@ -42,7 +42,7 @@ public class WorkoutServiceTest(DatabaseFixture fixture) : IntegrationTestBase(f
     public async Task UpdateAsync_Should_UpdateWorkout_WhenDataIsValid()
     {
         await CreateTestUserAsync();
-        var service = new WorkoutService(DbContext);
+        var service = new WorkoutService(UnitOfWork);
 
         await service.CreateAsync(
             "test-user-id",
@@ -67,7 +67,7 @@ public class WorkoutServiceTest(DatabaseFixture fixture) : IntegrationTestBase(f
     public async Task RemoveAsync_Should_RemoveWorkout_WhenDataIsValid()
     {
         await CreateTestUserAsync();
-        var service = new WorkoutService(DbContext);
+        var service = new WorkoutService(UnitOfWork);
 
         await service.CreateAsync(
             "test-user-id",
@@ -88,7 +88,7 @@ public class WorkoutServiceTest(DatabaseFixture fixture) : IntegrationTestBase(f
     public async Task GetByIdAsync_Should_ReturnWorkout_WhenWorkoutExists()
     {
         await CreateTestUserAsync();
-        var service = new WorkoutService(DbContext);
+        var service = new WorkoutService(UnitOfWork);
 
         await service.CreateAsync(
             "test-user-id",
@@ -109,7 +109,7 @@ public class WorkoutServiceTest(DatabaseFixture fixture) : IntegrationTestBase(f
     public async Task GetAllForUserAsync_Should_ReturnAllUserWorkouts_WhenUserHasWorkouts()
     {
         await CreateTestUserAsync();
-        var service = new WorkoutService(DbContext);
+        var service = new WorkoutService(UnitOfWork);
 
         await service.CreateAsync(
             "test-user-id",
@@ -133,7 +133,7 @@ public class WorkoutServiceTest(DatabaseFixture fixture) : IntegrationTestBase(f
     [Fact]
     public async Task GetByIdAsync_Should_ReturnNull_WhenWorkoutNotFound()
     {
-        var service = new WorkoutService(DbContext);
+        var service = new WorkoutService(UnitOfWork);
 
         var result = await service.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
 

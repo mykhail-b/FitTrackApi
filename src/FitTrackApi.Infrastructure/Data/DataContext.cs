@@ -1,4 +1,5 @@
-﻿using FitTrackApi.Infrastructure.Entity;
+﻿using FitTrackApi.Domain.Entity;
+using FitTrackApi.Infrastructure.IdentityEntity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,11 +23,20 @@ public class DataContext : IdentityDbContext<UserAccount>
     {
         base.OnModelCreating(modelBuilder);
 
-
         // Exercise
         modelBuilder.Entity<Exercise>(entity =>
         {
             entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Level).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Category).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Force).HasMaxLength(50);
+            entity.Property(e => e.Mechanic).HasMaxLength(50);
+            entity.Property(e => e.Equipment).HasMaxLength(100);
+            entity.Property(e => e.MeasurabilityType).HasMaxLength(50);
+
+            entity.HasIndex(e => e.Name);
 
             entity.Property(e => e.PrimaryMuscles).HasStringListConversion();
             entity.Property(e => e.SecondaryMuscles).HasStringListConversion();
@@ -34,26 +44,35 @@ public class DataContext : IdentityDbContext<UserAccount>
             entity.Property(e => e.Images).HasStringListConversion();
         });
 
-        // BodyMetric -> UserAccount (1 : many)
+        // BodyMetric -> UserAccount (1 : many), without navigation property in Domain
         modelBuilder.Entity<BodyMetric>(entity =>
         {
             entity.HasKey(d => d.Id);
 
-            entity.HasOne(d => d.User)
+            entity.Property(d => d.UserId).IsRequired();
+
+            entity.HasOne<UserAccount>()
                 .WithMany()
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(d => new { d.UserId, d.UpdatedAt });
         });
 
-        // Workout -> UserAccount (1 : many)
+        // Workout -> UserAccount (1 : many), without navigation property in Domain
         modelBuilder.Entity<Workout>(entity =>
         {
             entity.HasKey(w => w.Id);
 
-            entity.HasOne(w => w.User)
+            entity.Property(w => w.UserId).IsRequired();
+            entity.Property(w => w.Notes).HasMaxLength(1000);
+
+            entity.HasOne<UserAccount>()
                 .WithMany()
                 .HasForeignKey(w => w.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(w => new { w.UserId, w.Date });
         });
 
         // WorkoutExercise -> Workout (many : 1)
@@ -68,14 +87,12 @@ public class DataContext : IdentityDbContext<UserAccount>
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(we => we.Exercise)
-    .WithMany()
-    .HasForeignKey(we => we.ExerciseId)
-    .OnDelete(DeleteBehavior.Restrict);
+                .WithMany()
+                .HasForeignKey(we => we.ExerciseId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.Property(we => we.Weight)
                 .HasPrecision(10, 2);
         });
     }
-
-
 }

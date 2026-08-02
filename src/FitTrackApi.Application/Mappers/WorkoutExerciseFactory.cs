@@ -1,7 +1,7 @@
 ﻿using FitTrackApi.Application.Dto;
-using FitTrackApi.Infrastructure.Entity;
+using FitTrackApi.Domain.Entity;
 
-namespace FitTrackApi.Infrastructure.Mappers;
+namespace FitTrackApi.Application.Mappers;
 
 public static class WorkoutExerciseFactory
 {

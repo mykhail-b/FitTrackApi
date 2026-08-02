@@ -1,5 +1,5 @@
 ﻿using FitTrackApi.Application.Dto;
-using FitTrackApi.Infrastructure.Entity;
+using FitTrackApi.Infrastructure.IdentityEntity;
 using Microsoft.AspNetCore.Identity;
 
 namespace FitTrackApi.Infrastructure.Services;

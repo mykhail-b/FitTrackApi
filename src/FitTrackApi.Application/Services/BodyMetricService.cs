@@ -1,7 +1,7 @@
 ﻿using FitTrackApi.Application.Dto.User;
-using FitTrackApi.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-namespace FitTrackApi.Infrastructure.Services;
+using FitTrackApi.Application.Interfaces.RepositoryDI;
+
+namespace FitTrackApi.Application.Services;
 
 public interface IBodyMetricService
 {
@@ -11,13 +11,12 @@ public interface IBodyMetricService
 
 public class BodyMetricService : IBodyMetricService
 {
-    private readonly DataContext _dbContext;
-    public BodyMetricService(DataContext dbContext) => _dbContext = dbContext;
+    private readonly IUnitOfWork _unitOfWork;
+    public BodyMetricService(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
     public async Task<BodyMetricDto> GetAsync(string userId, CancellationToken ct = default)
     {
-        var m = await _dbContext.BodyMetrics.AsNoTracking()
-            .FirstOrDefaultAsync(b => b.UserId == userId, ct)
+        var m = await _unitOfWork.BodyMetrics.GetByUserIdAsync(userId, ct)
             ?? throw new KeyNotFoundException($"Body metrics not found for user {userId}");
 
         return new BodyMetricDto
@@ -38,8 +37,8 @@ public class BodyMetricService : IBodyMetricService
 
     public async Task<BodyMetricDto> UpdateAsync(string userId, BodyMetricDto dto, CancellationToken ct = default)
     {
-        var m = await _dbContext.BodyMetrics.FirstOrDefaultAsync(b => b.UserId == userId, ct)
-            ?? throw new KeyNotFoundException($"UserDetail not found for user {userId}");
+        var m = await _unitOfWork.BodyMetrics.GetByUserIdAsync(userId, ct)
+            ?? throw new KeyNotFoundException($"Body metrics not found for user {userId}");
 
         m.Height = dto.Height;
         m.Weight = dto.Weight;
@@ -54,7 +53,9 @@ public class BodyMetricService : IBodyMetricService
         m.CarbsGrams = dto.CarbsGrams;
         m.UpdatedAt = DateTime.UtcNow;
 
-        await _dbContext.SaveChangesAsync(ct);
+        _unitOfWork.BodyMetrics.Update(m);
+        await _unitOfWork.SaveChangesAsync(ct);
+
         return dto;
     }
 }

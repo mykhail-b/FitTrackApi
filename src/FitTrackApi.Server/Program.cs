@@ -1,3 +1,4 @@
+using FitTrackApi.Application;
 using FitTrackApi.Infrastructure;
 using FitTrackApi.Infrastructure.Configurations;
 using FitTrackApi.Server.Extensions;
@@ -14,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.Configure<SmtpConfiguration>(builder.Configuration.GetSection("SmtpConfiguration"));
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 builder.Services.AddForwardedHeadersSetup();
 builder.Services.AddClientCors(builder.Configuration);
 builder.Services.AddAntiforgerySetup();

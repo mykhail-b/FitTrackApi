@@ -1,10 +1,9 @@
-﻿namespace FitTrackApi.Infrastructure.Entity;
+﻿namespace FitTrackApi.Domain.Entity;
 
 public class Workout
 {
     public Guid Id { get; set; }
     public required string UserId { get; set; }
-    public UserAccount User { get; set; } = null!;
 
     public DateTime Date { get; set; } = DateTime.UtcNow;
     public string? Notes { get; set; }

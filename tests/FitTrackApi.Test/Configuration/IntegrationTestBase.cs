@@ -1,4 +1,6 @@
+using FitTrackApi.Application.Interfaces.RepositoryDI;
 using FitTrackApi.Infrastructure.Data;
+using FitTrackApi.Infrastructure.Repository;
 
 namespace FitTrackApi.Test.Configuration;
 
@@ -8,11 +10,14 @@ public abstract class IntegrationTestBase(DatabaseFixture fixture) : IAsyncLifet
     protected DatabaseFixture Fixture { get; } = fixture;
 
     protected DataContext DbContext { get; private set; } = null!;
+    protected IUnitOfWork UnitOfWork { get; private set; } = null!;
 
     public async ValueTask InitializeAsync()
     {
         await Fixture.ResetDatabaseAsync();
+
         DbContext = Fixture.CreateContext();
+        UnitOfWork = new UnitOfWork(DbContext);
     }
 
     public async ValueTask DisposeAsync()

@@ -57,19 +57,17 @@ namespace FitTrackApi.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Force = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Level = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Mechanic = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Equipment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Force = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Level = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Mechanic = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Equipment = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     PrimaryMuscles = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SecondaryMuscles = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Instructions = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Images = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MeasurabilityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsSystem = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    MeasurabilityType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -200,7 +198,6 @@ namespace FitTrackApi.Infrastructure.Migrations
                     ProteinGrams = table.Column<double>(type: "float", nullable: false),
                     FatGrams = table.Column<double>(type: "float", nullable: false),
                     CarbsGrams = table.Column<double>(type: "float", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -221,7 +218,7 @@ namespace FitTrackApi.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Notes = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -302,9 +299,14 @@ namespace FitTrackApi.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BodyMetrics_UserId",
+                name: "IX_BodyMetrics_UserId_UpdatedAt",
                 table: "BodyMetrics",
-                column: "UserId");
+                columns: new[] { "UserId", "UpdatedAt" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Exercises_Name",
+                table: "Exercises",
+                column: "Name");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WorkoutExercise_ExerciseId",
@@ -317,9 +319,9 @@ namespace FitTrackApi.Infrastructure.Migrations
                 column: "WorkoutId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Workouts_UserId",
+                name: "IX_Workouts_UserId_Date",
                 table: "Workouts",
-                column: "UserId");
+                columns: new[] { "UserId", "Date" });
         }
 
         /// <inheritdoc />

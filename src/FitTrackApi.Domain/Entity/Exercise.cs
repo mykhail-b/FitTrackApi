@@ -1,4 +1,4 @@
-﻿namespace FitTrackApi.Infrastructure.Entity;
+﻿namespace FitTrackApi.Domain.Entity;
 
 public class Exercise
 {
@@ -18,7 +18,5 @@ public class Exercise
     public List<string> Images { get; set; } = new();
 
     public string MeasurabilityType { get; set; } = "WeightAndReps";
-    public bool IsSystem { get; set; } = true;
-    public Guid? CreatedByUserId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -1,5 +1,5 @@
 ﻿using FitTrackApi.Application.Dto.User;
-using FitTrackApi.Infrastructure.Entity;
+using FitTrackApi.Infrastructure.IdentityEntity;
 using FitTrackApi.Infrastructure.Services;
 using FitTrackApi.Test.Configuration;
 

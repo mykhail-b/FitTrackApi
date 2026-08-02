@@ -7,11 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.5.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FitTrackApi.Domain\FitTrackApi.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Feature\BodyMetric\" />
+    <Folder Include="Feature\Exercise\" />
+    <Folder Include="Feature\Workout\" />
   </ItemGroup>
 
 </Project>

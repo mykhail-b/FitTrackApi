@@ -1,4 +1,6 @@
+using FitTrackApi.Application.Interfaces.RepositoryDI;
 using FitTrackApi.Infrastructure.Data;
+using FitTrackApi.Infrastructure.Repository;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Respawn;
@@ -51,6 +53,11 @@ public sealed class DatabaseFixture : IAsyncLifetime
         return new DataContext(CreateOptions());
     }
 
+    public IUnitOfWork CreateUnitOfWork()
+    {
+        return new UnitOfWork(CreateContext());
+    }
+
     public async Task ResetDatabaseAsync()
     {
         await _resetLock.WaitAsync();
@@ -86,7 +93,7 @@ public sealed class DatabaseFixture : IAsyncLifetime
     private DbContextOptions<DataContext> CreateOptions()
     {
         return new DbContextOptionsBuilder<DataContext>()
-            .UseSqlServer(ConnectionString, sql => sql.MigrationsAssembly("FitTrackApi.Server"))
+            .UseSqlServer(ConnectionString, sql => sql.MigrationsAssembly("FitTrackApi.Infrastructure"))
             .Options;
     }
 }

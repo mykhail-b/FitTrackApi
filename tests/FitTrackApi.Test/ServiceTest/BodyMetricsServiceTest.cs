@@ -1,6 +1,7 @@
 ﻿using FitTrackApi.Application.Dto.User;
-using FitTrackApi.Infrastructure.Entity;
-using FitTrackApi.Infrastructure.Services;
+using FitTrackApi.Application.Services;
+using FitTrackApi.Domain.Entity;
+using FitTrackApi.Infrastructure.IdentityEntity;
 using FitTrackApi.Test.Configuration;
 
 namespace FitTrackApi.Test.ServiceTest;
@@ -43,7 +44,7 @@ public class BodyMetricServiceTest(DatabaseFixture fixture) : IntegrationTestBas
     public async Task GetAsync_Should_ReturnBodyMetrics_WhenDataIsValid()
     {
         var metric = await CreateTestBodyMetricAsync();
-        var service = new BodyMetricService(DbContext);
+        var service = new BodyMetricService(UnitOfWork);
 
         var result = await service.GetAsync(metric.UserId, CancellationToken.None);
 
@@ -55,7 +56,7 @@ public class BodyMetricServiceTest(DatabaseFixture fixture) : IntegrationTestBas
     [Fact]
     public async Task GetAsync_Should_Throw_WhenBodyMetricsNotFound()
     {
-        var service = new BodyMetricService(DbContext);
+        var service = new BodyMetricService(UnitOfWork);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() =>
             service.GetAsync("non-existent-id", CancellationToken.None));
@@ -65,7 +66,7 @@ public class BodyMetricServiceTest(DatabaseFixture fixture) : IntegrationTestBas
     public async Task UpdateAsync_Should_UpdateBodyMetrics_WhenDataIsValid()
     {
         var metric = await CreateTestBodyMetricAsync();
-        var service = new BodyMetricService(DbContext);
+        var service = new BodyMetricService(UnitOfWork);
 
         var dto = new BodyMetricDto
         {

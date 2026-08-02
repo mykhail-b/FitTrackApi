@@ -1,5 +1,7 @@
-﻿using FitTrackApi.Infrastructure.Data;
-using FitTrackApi.Infrastructure.Entity;
+﻿using FitTrackApi.Application.Interfaces.RepositoryDI;
+using FitTrackApi.Infrastructure.Data;
+using FitTrackApi.Infrastructure.IdentityEntity;
+using FitTrackApi.Infrastructure.Repository;
 using FitTrackApi.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +30,17 @@ public static class DependencyInjection
         .AddEntityFrameworkStores<DataContext>()
         .AddDefaultTokenProviders();
 
-        // === Application service implementations ===
+        // === Infrastructure service implementations ===
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IBodyMetricService, BodyMetricService>();
-        services.AddScoped<IWorkoutService, WorkoutService>();
-        services.AddScoped<IExerciseService, ExerciseService>();
+
+
+        // Repositories and UnitOfWork
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IExerciseRepository, ExerciseRepository>();
+        services.AddScoped<IWorkoutRepository, WorkoutRepository>();
+        services.AddScoped<IBodyMetricRepository, BodyMetricRepository>();
 
         return services;
     }

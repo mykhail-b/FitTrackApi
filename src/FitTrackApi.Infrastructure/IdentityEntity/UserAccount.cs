@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace FitTrackApi.Infrastructure.Entity;
+namespace FitTrackApi.Infrastructure.IdentityEntity;
 
 public class UserAccount : IdentityUser
 {

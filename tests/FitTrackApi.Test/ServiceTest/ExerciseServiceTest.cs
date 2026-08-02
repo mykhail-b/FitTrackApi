@@ -1,5 +1,5 @@
-﻿using FitTrackApi.Infrastructure.Entity;
-using FitTrackApi.Infrastructure.Services;
+﻿using FitTrackApi.Application.Services;
+using FitTrackApi.Domain.Entity;
 using FitTrackApi.Test.Configuration;
 
 namespace FitTrackApi.Test.ServiceTest;
@@ -27,7 +27,7 @@ public class ExerciseServiceTest(DatabaseFixture fixture) : IntegrationTestBase(
     {
         var created = await CreateTestExerciseAsync("Push Up");
 
-        var service = new ExerciseService(DbContext);
+        var service = new ExerciseService(UnitOfWork);
 
         var result = await service.GetByIdAsync(created.Id, CancellationToken.None);
 
@@ -41,7 +41,7 @@ public class ExerciseServiceTest(DatabaseFixture fixture) : IntegrationTestBase(
     [Fact]
     public async Task GetByIdAsync_Should_ReturnNull_WhenExerciseNotFound()
     {
-        var service = new ExerciseService(DbContext);
+        var service = new ExerciseService(UnitOfWork);
 
         var result = await service.GetByIdAsync(99999, CancellationToken.None);
 
@@ -57,7 +57,7 @@ public class ExerciseServiceTest(DatabaseFixture fixture) : IntegrationTestBase(
             await CreateTestExerciseAsync($"Exercise {i}");
         }
 
-        var service = new ExerciseService(DbContext);
+        var service = new ExerciseService(UnitOfWork);
 
         var page = await service.GetPagedAsync(2, 10, CancellationToken.None);
 

@@ -1,5 +1,6 @@
 ﻿
 using FitTrackApi.Application.Dto;
+using FitTrackApi.Application.Services;
 using FitTrackApi.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -66,7 +67,7 @@ public class WorkoutController : ControllerBase
     [HttpGet("activity")]
     public async Task<ActionResult<List<DateOnly>>> GetWorkoutActivity(CancellationToken cancellationToken)
     {
-        var result = await _workoutService.GetWorkoutActivity(CurrentUserId, cancellationToken);
+        var result = await _workoutService.GetWorkoutActivityAsync(CurrentUserId, cancellationToken);
         return Ok(result);
     }
 
