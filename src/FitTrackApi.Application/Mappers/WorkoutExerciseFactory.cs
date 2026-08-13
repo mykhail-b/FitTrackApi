@@ -1,4 +1,4 @@
-﻿using FitTrackApi.Application.Dto;
+﻿using FitTrackApi.Application.Dto.Workout;
 using FitTrackApi.Domain.Entity;
 
 namespace FitTrackApi.Application.Mappers;

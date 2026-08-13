@@ -11,7 +11,6 @@ public class ExerciseServiceTest(DatabaseFixture fixture) : IntegrationTestBase(
         var exercise = new Exercise
         {
             Name = name,
-            Level = "Beginner",
             Category = "Strength",
             Images = new List<string> { $"/images/{name.ToLower().Replace(' ', '-')}.jpg" },
             PrimaryMuscles = new List<string> { "Chest" }
@@ -33,7 +32,6 @@ public class ExerciseServiceTest(DatabaseFixture fixture) : IntegrationTestBase(
 
         Assert.NotNull(result);
         Assert.Equal("Push Up", result!.Name);
-        Assert.Equal("Beginner", result.Level);
         Assert.NotEmpty(result.Images);
         Assert.Contains("/images/push-up.jpg", result.Images);
     }

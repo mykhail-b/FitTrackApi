@@ -1,0 +1,56 @@
+name: .NET CI
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.local/share/NuGet
+          key: nuget-${{ runner.os }}-$(hashFiles('**/*.csproj'))
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Ensure Docker is available (required by Testcontainers)
+        run: |
+          echo "Docker version:"
+          docker --version || true
+          echo "Docker info:"
+          docker info || true
+
+      - name: Restore
+        run: dotnet restore FitTrackApi.slnx
+
+      - name: Build
+        run: dotnet build FitTrackApi.slnx --no-restore --configuration Release
+
+      - name: Run xUnit tests (Testcontainers will use Docker on the runner)
+        run: |
+          dotnet test tests/FitTrackApi.Test/FitTrackApi.Test.csproj --no-build --configuration Release --logger "trx;LogFileName=TestResults.trx" --results-directory ./TestResults
+        env:
+          DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: TestResults

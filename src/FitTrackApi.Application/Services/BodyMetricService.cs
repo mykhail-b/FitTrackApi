@@ -53,7 +53,7 @@ public class BodyMetricService : IBodyMetricService
         m.CarbsGrams = dto.CarbsGrams;
         m.UpdatedAt = DateTime.UtcNow;
 
-        _unitOfWork.BodyMetrics.Update(m);
+        await _unitOfWork.BodyMetrics.UpdateAsync(m);
         await _unitOfWork.SaveChangesAsync(ct);
 
         return dto;

@@ -1,7 +1,6 @@
 ﻿using FitTrackApi.Application.Dto;
 using FitTrackApi.Application.Dto.Exercise;
 using FitTrackApi.Application.Services;
-using FitTrackApi.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

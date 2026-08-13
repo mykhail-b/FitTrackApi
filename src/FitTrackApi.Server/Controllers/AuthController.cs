@@ -1,4 +1,5 @@
-﻿using FitTrackApi.Application.Dto;
+﻿using FitTrackApi.Application.Dto.Auth;
+using FitTrackApi.Application.Dto.Responses;
 using FitTrackApi.Infrastructure.IdentityEntity;
 using FitTrackApi.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +30,11 @@ public class AuthController : ControllerBase
         if (!result.Succeeded)
             return BadRequest(new { error = result.Error });
 
-        return Ok(new { message = "Registration successful" });
+        return Ok(new ApiSuccessResponse
+        {
+            Message = "Registration successful",
+            Data = new { email = request.Email, fullName = request.FullName }
+        });
     }
 
     [HttpPost("login")]
@@ -41,7 +46,10 @@ public class AuthController : ControllerBase
         if (!result.Succeeded)
             return Unauthorized(new { error = result.Error });
 
-        return Ok(new { message = "Login successful" });
+        return Ok(new ApiSuccessResponse
+        {
+            Message = "Login successful"
+        });
     }
 
     [HttpPost("logout")]
@@ -49,7 +57,11 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Logout()
     {
         await _authService.LogoutAsync();
-        return Ok(new { message = "Logged out" });
+
+        return Ok(new ApiSuccessResponse
+        {
+            Message = "Logged out"
+        });
     }
 
     [HttpGet("me")]
@@ -61,11 +73,15 @@ public class AuthController : ControllerBase
         if (user is null)
             return Unauthorized();
 
-        return Ok(new
+        return Ok(new ApiSuccessResponse
         {
-            id = user.Id,
-            username = user.UserName,
-            fullName = user.FullName
+            Message = "User info",
+            Data = new
+            {
+                id = user.Id,
+                username = user.UserName,
+                fullName = user.FullName
+            }
         });
     }
 }

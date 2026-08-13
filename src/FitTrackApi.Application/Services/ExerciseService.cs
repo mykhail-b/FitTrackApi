@@ -25,7 +25,6 @@ public class ExerciseService : IExerciseService
             Id = e.Id,
             Name = e.Name,
             Force = e.Force,
-            Level = e.Level,
             Mechanic = e.Mechanic,
             Equipment = e.Equipment,
             PrimaryMuscles = e.PrimaryMuscles,

@@ -16,19 +16,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // === EF Core ===
-        services.AddDbContext<DataContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-        // === Identity ===
-        services.AddIdentity<UserAccount, IdentityRole>(options =>
-        {
-            options.Password.RequireDigit = true;
-            options.Password.RequiredLength = 8;
-            options.Password.RequireNonAlphanumeric = false;
-        })
-        .AddEntityFrameworkStores<DataContext>()
-        .AddDefaultTokenProviders();
 
         // === Infrastructure service implementations ===
         services.AddScoped<IEmailService, EmailService>();

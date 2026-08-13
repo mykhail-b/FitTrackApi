@@ -24,7 +24,7 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntit
     public async Task AddAsync(TEntity entity, CancellationToken ct = default)
         => await DbSet.AddAsync(entity, ct);
 
-    public void Update(TEntity entity) => DbSet.Update(entity);
+    public async Task UpdateAsync(TEntity entity) => DbSet.Update(entity);
 
-    public void Remove(TEntity entity) => DbSet.Remove(entity);
+    public async Task RemoveAsync(TEntity entity) => DbSet.Remove(entity);
 }

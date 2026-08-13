@@ -1,11 +1,9 @@
 [![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-purple?logo=dotnet&logoColor=white)](#)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple?logo=dotnet&logoColor=white)](#)
-![EF Core](https://img.shields.io/badge/Entity_Framework_Core-10.0-green?logo=efcore&logoColor=white)
 ![MSSQL](https://img.shields.io/badge/Microsoft_SQL_Server-DB-red?logo=microsoftsqlserver&logoColor=white)
 ![Web API](https://img.shields.io/badge/Web_API-REST-blue?logo=swagger&logoColor=white)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](#)
-[![xUnit.net](https://img.shields.io/badge/xUnit.net-tests-orange?logo=xunit&logoColor=white)](https://xunit.net/)
-
+![Build and Test](https://github.com/mykhail-b/FitTrackApi/actions/workflows/build-and-test.yml/badge.svg)
 
 
 # 💪 Fitness Tracker API 

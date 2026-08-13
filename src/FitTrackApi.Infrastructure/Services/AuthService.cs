@@ -1,4 +1,4 @@
-﻿using FitTrackApi.Application.Dto;
+﻿using FitTrackApi.Application.Dto.Auth;
 using FitTrackApi.Infrastructure.IdentityEntity;
 using Microsoft.AspNetCore.Identity;
 

@@ -18,22 +18,43 @@ public class UserController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null) return Unauthorized();
 
-        var userInfo = await _userService.GetUserInfoAsync(userId, ct);
-        return userInfo is null ? NotFound() : Ok(userInfo);
+        try
+        {
+            var userInfo = await _userService.GetUserInfoAsync(userId, ct);
+            return Ok(userInfo);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpGet("{userId}")]
     public async Task<ActionResult> GetUserInfo(string userId, CancellationToken ct)
     {
-        var userInfo = await _userService.GetUserInfoAsync(userId, ct);
-        return userInfo is null ? NotFound() : Ok(userInfo);
+        try
+        {
+            var userInfo = await _userService.GetUserInfoAsync(userId, ct);
+            return Ok(userInfo);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpPost("{userId}")]
     public async Task<ActionResult> UpdateUserInfo(string userId, [FromBody] UserInfoDto dto, CancellationToken ct)
     {
-        var success = await _userService.UpdateUserInfoAsync(userId, dto, ct);
-        return success ? NoContent() : NotFound();
+        try
+        {
+            var updated = await _userService.UpdateUserInfoAsync(userId, dto, ct);
+            return Ok(updated);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpDelete("{userId}")]

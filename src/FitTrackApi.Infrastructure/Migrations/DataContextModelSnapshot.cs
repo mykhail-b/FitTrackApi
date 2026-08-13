@@ -107,11 +107,6 @@ namespace FitTrackApi.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Level")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("MeasurabilityType")
                         .IsRequired()
                         .HasMaxLength(50)

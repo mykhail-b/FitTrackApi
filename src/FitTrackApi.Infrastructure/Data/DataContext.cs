@@ -7,13 +7,14 @@ namespace FitTrackApi.Infrastructure.Data;
 
 public class DataContext : IdentityDbContext<UserAccount>
 {
-    public DataContext(DbContextOptions options) : base(options)
+    public DataContext(DbContextOptions<DataContext> options)
+    : base(options)
     {
     }
 
-    protected DataContext()
-    {
-    }
+    //protected DataContext()
+    //{
+    //}
 
     public DbSet<Exercise> Exercises { get; set; }
     public DbSet<Workout> Workouts { get; set; }
@@ -29,7 +30,6 @@ public class DataContext : IdentityDbContext<UserAccount>
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
-            entity.Property(e => e.Level).HasMaxLength(50).IsRequired();
             entity.Property(e => e.Category).HasMaxLength(100).IsRequired();
             entity.Property(e => e.Force).HasMaxLength(50);
             entity.Property(e => e.Mechanic).HasMaxLength(50);

@@ -1,4 +1,4 @@
-﻿namespace FitTrackApi.Application.Dto;
+﻿namespace FitTrackApi.Application.Dto.Workout;
 
 public class WorkoutExerciseDto
 {

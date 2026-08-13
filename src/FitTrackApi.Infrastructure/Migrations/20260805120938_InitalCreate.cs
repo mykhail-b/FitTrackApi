@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FitTrackApi.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitalCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,7 +59,6 @@ namespace FitTrackApi.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Force = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Level = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Mechanic = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Equipment = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     PrimaryMuscles = table.Column<string>(type: "nvarchar(max)", nullable: false),

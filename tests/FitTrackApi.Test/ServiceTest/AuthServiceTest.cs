@@ -1,4 +1,4 @@
-﻿using FitTrackApi.Application.Dto;
+﻿using FitTrackApi.Application.Dto.Auth;
 using FitTrackApi.Infrastructure.Data;
 using FitTrackApi.Infrastructure.IdentityEntity;
 using FitTrackApi.Infrastructure.Services;

@@ -5,7 +5,6 @@ public class Exercise
     public int Id { get; set; }
     public string Name { get; set; } = null!;
     public string? Force { get; set; }
-    public string Level { get; set; } = null!;
     public string? Mechanic { get; set; }
     public string? Equipment { get; set; }
 

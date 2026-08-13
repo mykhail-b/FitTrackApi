@@ -1,7 +1,11 @@
 using FitTrackApi.Application;
 using FitTrackApi.Infrastructure;
 using FitTrackApi.Infrastructure.Configurations;
+using FitTrackApi.Infrastructure.Data;
+using FitTrackApi.Infrastructure.IdentityEntity;
 using FitTrackApi.Server.Extensions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +24,20 @@ builder.Services.AddForwardedHeadersSetup();
 builder.Services.AddClientCors(builder.Configuration);
 builder.Services.AddAntiforgerySetup();
 builder.Services.AddCookieAuthSetup();
+
+// This will be temporary
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlServer(
+        "Server=(localdb)\\MSSQLLocalDB;Database=FitTrackDb;Trusted_Connection=True;TrustServerCertificate=True;"));
+// === Identity ===
+builder.Services.AddIdentity<UserAccount, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = false;
+})
+.AddEntityFrameworkStores<DataContext>()
+.AddDefaultTokenProviders();
 
 var app = builder.Build();
 

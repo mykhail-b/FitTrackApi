@@ -36,13 +36,12 @@ public class UserServiceTest(DatabaseFixture fixture) : IntegrationTestBase(fixt
     }
 
     [Fact]
-    public async Task GetUserInfoAsync_Should_ReturnNull_WhenUserNotFound()
+    public async Task GetUserInfoAsync_Should_ThrowKeyNotFoundException_WhenUserNotFound()
     {
         var service = new UserService(DbContext);
 
-        var result = await service.GetUserInfoAsync("non-existent-id", CancellationToken.None);
-
-        Assert.Null(result);
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => service.GetUserInfoAsync("non-existent-id", CancellationToken.None));
     }
 
     [Fact]
@@ -58,7 +57,9 @@ public class UserServiceTest(DatabaseFixture fixture) : IntegrationTestBase(fixt
 
         var result = await service.UpdateUserInfoAsync(user.Id, dto, CancellationToken.None);
 
-        Assert.True(result);
+        Assert.NotNull(result);
+        Assert.Equal("Updated Name", result.FullName);
+        Assert.Equal("updated@fittrack.com", result.Email);
 
         var updated = DbContext.Users.First(u => u.Id == user.Id);
         Assert.Equal("Updated Name", updated.FullName);
@@ -66,7 +67,7 @@ public class UserServiceTest(DatabaseFixture fixture) : IntegrationTestBase(fixt
     }
 
     [Fact]
-    public async Task UpdateUserInfoAsync_Should_ReturnFalse_WhenUserNotFound()
+    public async Task UpdateUserInfoAsync_Should_ThrowKeyNotFoundException_WhenUserNotFound()
     {
         var service = new UserService(DbContext);
         var dto = new UserInfoDto
@@ -75,9 +76,8 @@ public class UserServiceTest(DatabaseFixture fixture) : IntegrationTestBase(fixt
             Email = "x@x.com"
         };
 
-        var result = await service.UpdateUserInfoAsync("non-existent-id", dto, CancellationToken.None);
-
-        Assert.False(result);
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => service.UpdateUserInfoAsync("non-existent-id", dto, CancellationToken.None));
     }
 
     [Fact]

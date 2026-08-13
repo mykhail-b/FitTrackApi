@@ -7,7 +7,6 @@
   </Folder>
 
   <Folder Name="/tests/">
-    <Project Path="tests/FitTrack.PlaywrightTests/FitTrack.PlaywrightTests.csproj" />
     <Project Path="tests/FitTrackApi.Test/FitTrackApi.Test.csproj" />
   </Folder>
   <Project Path="docker-compose.dcproj">

@@ -1,4 +1,4 @@
-﻿using FitTrackApi.Application.Dto;
+﻿using FitTrackApi.Application.Dto.Workout;
 using FitTrackApi.Application.Interfaces.RepositoryDI;
 using FitTrackApi.Application.Mappers;
 using FitTrackApi.Domain.Entity;
@@ -64,7 +64,7 @@ public class WorkoutService : IWorkoutService
         workout.Notes = notes;
 
         // Ensure the modified workout is tracked so changes are persisted
-        _unitOfWork.Workouts.Update(workout);
+        await _unitOfWork.Workouts.UpdateAsync(workout);
 
         var newExercises = WorkoutExerciseFactory.BuildFrom(workout.Id, workout, exercises);
         await _unitOfWork.Workouts.ReplaceExercisesAsync(workout, newExercises, ct);
@@ -80,7 +80,7 @@ public class WorkoutService : IWorkoutService
         var workout = await _unitOfWork.Workouts.GetByIdAsync(workoutId, ct);
         if (workout is null) return false;
 
-        _unitOfWork.Workouts.Remove(workout);
+        await _unitOfWork.Workouts.RemoveAsync(workout);
         await _unitOfWork.SaveChangesAsync(ct);
         return true;
     }
