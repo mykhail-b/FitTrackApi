@@ -1,10 +1,11 @@
-﻿using FitTrackApi.Core.Dto.User;
+﻿using FitTrackApi.Application.Dto.User;
+using FitTrackApi.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 [Authorize]
-[Route("api/user")]
+[Route("api/v1/user")]
 [ApiController]
 public class UserController : ControllerBase
 {
@@ -17,22 +18,43 @@ public class UserController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null) return Unauthorized();
 
-        var userInfo = await _userService.GetUserInfoAsync(userId, ct);
-        return userInfo is null ? NotFound() : Ok(userInfo);
+        try
+        {
+            var userInfo = await _userService.GetUserInfoAsync(userId, ct);
+            return Ok(userInfo);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpGet("{userId}")]
     public async Task<ActionResult> GetUserInfo(string userId, CancellationToken ct)
     {
-        var userInfo = await _userService.GetUserInfoAsync(userId, ct);
-        return userInfo is null ? NotFound() : Ok(userInfo);
+        try
+        {
+            var userInfo = await _userService.GetUserInfoAsync(userId, ct);
+            return Ok(userInfo);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpPost("{userId}")]
-    public async Task<ActionResult> UpdateUserInfo(string userId, [FromBody] UserInfoDto dto, CancellationToken ct)
+    public async Task<ActionResult> UpdateUserInfo(string userId, [FromBody] UserDto dto, CancellationToken ct)
     {
-        var success = await _userService.UpdateUserInfoAsync(userId, dto, ct);
-        return success ? NoContent() : NotFound();
+        try
+        {
+            var updated = await _userService.UpdateUserInfoAsync(userId, dto, ct);
+            return Ok(updated);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpDelete("{userId}")]

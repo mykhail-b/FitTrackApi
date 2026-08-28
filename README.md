@@ -1,111 +1,101 @@
-![ASP.NET Core](https://badgen.net/badge/ASP.NET/Core/purple?icon=dotnet)
-![.NET](https://img.shields.io/badge/.NET-10.0-purple?logo=dotnet&logoColor=white)
-![EF Core](https://img.shields.io/badge/Entity_Framework_Core-10.0-green?logo=efcore&logoColor=white)
-![MSSQL](https://img.shields.io/badge/Microsoft_SQL_Server-DB-red?logo=microsoftsqlserver&logoColor=white)
-![Web API](https://img.shields.io/badge/Web_API-REST-blue?logo=swagger&logoColor=white)
-
-
-
-
 # 💪 Fitness Tracker API 
 
 A RESTful API for tracking workouts, exercises, and body metrics
 
 ## 💡 Motivation
 
-I built FitTrack to showcase backend development with .NET — my favorite area of software engineering. I've started several side projects before, but often abandoned them once the scope grew too large to finish. This time, I deliberately kept the project focused: a single, well-defined domain with clear business rules, built end-to-end rather than left half-done.
+I built FitTrack to improve my backend development skills with .NET and to have a project that reflects the kind of software I enjoy building.
 
-I'm also into fitness myself, which made this domain a natural fit — workout tracking, 
-calorie calculations, and body metrics involve just enough real-world logic (BMR/TDEE formulas, nutrient tracking, workout history) to be genuinely interesting to model, 
-without ballooning into something unmanageable.
+In the past, I started several side projects but made them too ambitious and never finished them. With FitTrack, I decided to keep the scope focused and build a complete application instead of constantly adding new features.
 
+Fitness was a natural choice because it involves real business logic, such as workout history and body metrics, while keeping the project manageable.
+
+## Features
+
+- User registration and authentication
+- Workout management
+- Exercise catalog
+- Users workout lists and activity data
+- Food catalog
+- Cookie-based authentication
 
 ## 🔨 Tech Stack
 
 * **Backend:** ASP.NET Core Web API
 * **Database:** Microsoft SQL Server
 * **ORM:** Entity Framework Core
-* **Auth:** ASP.NET Core Identity
-* **API Documentation:** Swagger
+* **Authentication:** ASP.NET Core Identity
+* **Authorization:** Cookie Authentication (HttpOnly Cookies)
+* **API Documentation:** Scalar
 
 ## Architecture
 
-The solution is split into three projects:
+The solution is organized into the following projects:
 
-- **FitTrackApi.Core** — Shared class library with EF Core entities, DTOs, configuration models, and extension methods.
-- **FitTrackApi.Server** — REST API server containing controllers, services im, and the EF Core `DataContext`.
-- **FitTrackApi.Test** — xUnit test project with unit tests for business logic and integration tests that run against an isolated database via Testcontainers (Docker).
+- **FitTrackApi.Server** — ASP.NET Core Web API entry point. Contains controllers, dependency injection configuration, middleware, and application startup.
 
-### Server-side architecture
+- **FitTrackApi.Application** — Contains business logic, CQRS service used by MediatR, DTOs, mappers, and interfaces implemented by the Infrastructure layer.
 
-`FitTrackApi.Server` follows a **Controller + Service** architecture:
+- **FitTrackApi.Domain** — Contains domain entities and core domain models shared across the application.
 
-Controller → Service → EF Core DbContext → SQL Server
-
-Controllers are kept thin — they handle HTTP concerns only (routing, model binding, 
-status codes) and delegate all business logic to services. Each domain (Users, 
-Workouts, Exercises, Body Metrics) has its own service and interface, registered 
-via dependency injection.
-
-An earlier iteration used a CQRS-style command/query dispatcher, but for this 
-project's CRUD-focused scope it added unnecessary indirection without real benefit — 
-refactored to the simpler Controller → Service flow above.
+- **FitTrackApi.Infrastructure** — Contains data access with EF Core (`DataContext`, repositories, migrations) and infrastructure services such as ASP.NET Core Identity, email services, and other external integrations.
 
 ### Authentication
 
-Authentication uses **HttpOnly cookies** via ASP.NET Core Identity, rather than 
-JWTs stored client-side. Since the cookie is inaccessible to JavaScript, it 
-significantly reduces the risk of token theft via XSS — the browser attaches it 
-automatically on each request, and the client never handles the token directly. 
-Protected endpoints are guarded with `[Authorize]`, and the current user's id is 
-read from `ClaimTypes.NameIdentifier`.
+Authentication is implemented with **ASP.NET Core Identity** using **HttpOnly authentication cookies**. After a successful sign-in, the browser automatically includes the authentication cookie with subsequent requests, so the client does not need to manage authentication tokens manually. Protected endpoints are secured with the `[Authorize]` attribute, and the authenticated user's identifier is retrieved from `ClaimTypes.NameIdentifier`.
+
 
 ## API Endpoints
 
 ### Auth
 | Method | Endpoint | Description |
 |--------|----------|--------------|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Log in, sets HttpOnly auth cookie |
-| POST | `/api/auth/logout` | Log out, clears auth cookie |
-| GET | `/api/auth/me` | Get currently authenticated user |
+| POST | `/api/v1/auth/register` | Register a new user |
+| POST | `/api/v1/auth/login` | Log in, sets HttpOnly auth cookie |
+| POST | `/api/v1/auth/logout` | Log out, clears auth cookie |
+| GET | `/api/v1/auth/me` | Get currently authenticated user |
 
-### Users
+### User
 | Method | Endpoint | Description |
 |--------|----------|--------------|
-| GET | `/api/user/me` | Get current user's info |
-| GET | `/api/user/{userId}` | Get user info by id |
-| POST | `/api/user/{userId}` | Update user info |
-| DELETE | `/api/user/{userId}` | Delete user account |
+| GET | `/api/v1/user/me` | Get current user's info |
+| GET | `/api/v1/user/{userId}` | Get user info by id |
+| POST | `/api/v1/user/{userId}` | Update user info |
+| DELETE | `/api/v1/user/{userId}` | Delete user account |
 
-### Body Metrics
-| Method | Endpoint | Description |
-|--------|----------|--------------|
-| GET | `/api/bodymetrics/{userId}` | Get body metrics (height, weight, BMR/TDEE, macros) |
-| PUT | `/api/bodymetrics/{userId}` | Update body metrics |
-
-### Workouts
-| Method | Endpoint | Description |
-|--------|----------|--------------|
-| GET | `/api/workout` | Get all workouts for current user |
-| GET | `/api/workout/{workoutId}` | Get a specific workout |
-| POST | `/api/workout` | Create a new workout |
-| PUT | `/api/workout/{workoutId}` | Update a workout |
-| DELETE | `/api/workout/{workoutId}` | Delete a workout |
 
 ### Exercises
 | Method | Endpoint | Description |
 |--------|----------|--------------|
-| GET | `/api/exercise?pageNumber=1&pageSize=10` | Get paged list of exercises |
-| GET | `/api/exercise/{exerciseId}` | Get exercise details |
-
-Full interactive documentation is available via Swagger UI at `/swagger` in Development.
+| GET | `/api/v1/exercise?pageNumber=1&pageSize=10` | Get paged list of exercises |
+| GET | `/api/v1/exercise/{exerciseId}` | Get exercise details |
+| POST | `/api/v1/exercise` | Create a new exercise |
+| PUT | `/api/v1/exercise/{exerciseId}` | Update an exercise |
+| DELETE | `/api/v1/exercise/{exerciseId}` | Delete an exercise |
+ 
+### Food
+| Method | Endpoint | Description |
+|--------|----------|--------------|
+| GET | `/api/v1/food?pageNumber=1&pageSize=10` | Get paged list of food items |
+| GET | `/api/v1/food/{foodId}` | Get food item details |
+| POST | `/api/v1/food` | Create a new food item |
+| PUT | `/api/v1/food/{foodId}` | Update a food item |
+| DELETE | `/api/v1/food/{foodId}` | Delete a food item |
+ 
+### Workouts
+| Method | Endpoint | Description |
+|--------|----------|--------------|
+| GET | `/api/v1/workout?pageNumber=1&pageSize=10` | Get paged list of workouts for the current user |
+| GET | `/api/v1/workout/{workoutId}` | Get a specific workout |
+| GET | `/api/v1/workout/activity` | Get the current user's workout activity dates |
+| POST | `/api/v1/workout` | Create a new workout |
+| PUT | `/api/v1/workout/{workoutId}` | Update a workout |
+| DELETE | `/api/v1/workout/{workoutId}` | Delete a workout |
 
 ## 🚀 Getting started 
 ### Prerequisites
 - .NET 10 SDK
 - Microsoft SQL Server (Express, LocalDB, or full edition — any works for local development)
-- Docker (only required for running integration tests via Testcontainers)
 
 ### Setup
 
@@ -120,7 +110,7 @@ Full interactive documentation is available via Swagger UI at `/swagger` in Deve
     ```bash
     > cd FitTrackApi.Server
     > dotnet user-secrets init
-    > dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=(localdb)\\mssqllocaldb;Database=FitTrackDb Trusted_Connection=True;"
+    > dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=(localdb)\\mssqllocaldb;Database=FitTrackDb;Trusted_Connection=True;"
     ```
 
 3. Apply EF Core migrations
@@ -130,25 +120,7 @@ Full interactive documentation is available via Swagger UI at `/swagger` in Deve
 
 4. Run the API
    ```bash
-   > dotnet run
+   > dotnet run --project /src/FitTrackApi.Server
    ```
 
-5. Open Swagger UI at `https://localhost:7114/swagger`
-
-### Running tests
-```bash
-> cd FitTrackApi.Test
-> dotnet test
-```
-Integration tests spin up a real SQL Server instance in Docker via Testcontainers — 
-make sure Docker is running before executing them.
-
-## ✍️ Lessons Learned
-
-- Refactored from CQRS-style dispatchers to a simpler Controller → Service 
-  architecture once it became clear the indirection wasn't paying for itself 
-  in a CRUD-focused project
-- Learned proper environment-based configuration (User Secrets, env vars) 
-  instead of hardcoding connection strings
-- First time using Testcontainers for integration tests instead of mocking 
-  the database entirely
+5. Open Scalar UI at `https://localhost:7114/scalar/v1`

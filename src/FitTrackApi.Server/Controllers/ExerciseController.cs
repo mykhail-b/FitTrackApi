@@ -1,44 +1,72 @@
-﻿using FitTrackApi.Core.Dto.Exercise;
-using FitTrackApi.Server.Services;
+﻿using FitTrackApi.Application.Dto;
+using FitTrackApi.Application.Dto.Exercise;
+using FitTrackApi.Application.Feature.Exercises.Commands;
+using FitTrackApi.Application.Feature.Exercises.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitTrackApi.Server.Controllers;
 
 [Authorize]
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 [ApiController]
 public class ExerciseController : ControllerBase
 {
-    private readonly IExerciseService _exerciseService;
+    private readonly IMediator _mediator;
 
-    public ExerciseController(IExerciseService exerciseService)
+    public ExerciseController(IMediator mediator)
     {
-        _exerciseService = exerciseService;
+        _mediator = mediator;
     }
 
     // GET
     [HttpGet]
-    public async Task<ActionResult<PagedListResult<ExerciseListItem>>> GetAllExercises(
+    public async Task<ActionResult<PagedListResponse<ExerciseShortResponse>>> GetAllExercises(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await _exerciseService.GetPagedAsync(pageNumber, pageSize, cancellationToken);
+        var result = await _mediator.Send(new GetExercisePagedQuery(pageNumber, pageSize),  cancellationToken);
+        
         return Ok(result);
     }
 
     // GET {id}
-    [HttpGet("{exerciseId}")]
-    public async Task<ActionResult<ExerciseDetailsResult>> GetExerciseById(
-        [FromRoute] int exerciseId,
+    [HttpGet("{exerciseId:guid}")]
+    public async Task<ActionResult<ExerciseResponse>> GetExerciseById(
+        [FromRoute] Guid exerciseId,
         CancellationToken cancellationToken = default)
     {
-        var exercise = await _exerciseService.GetByIdAsync(exerciseId, cancellationToken);
+        var result = await _mediator.Send(new GetExerciseByIdQuery(exerciseId), cancellationToken);
 
-        if (exercise is null)
-            return NotFound(new { Message = $"Exercise with ID {exerciseId} not found." });
-
-        return Ok(exercise);
+        return Ok(result);
+    }
+    
+    // POST
+    [HttpPost]
+    public async Task<ActionResult<ExerciseResponse>> CreateExercise(
+        [FromBody] CreateExerciseRequest createExerciseRequest, 
+        CancellationToken cancellationToken = default)
+    {
+        var  result = await _mediator.Send(new CreateExerciseCommand(createExerciseRequest), cancellationToken);
+        return CreatedAtAction(nameof(GetExerciseById), new { exerciseId = result.Id }, result);
+    }
+    //PUT {id}
+    [HttpPut("{exerciseId:guid}")]
+    public async Task<ActionResult<ExerciseResponse>> UpdateExercise(
+        [FromRoute] Guid exerciseId,
+        [FromBody] UpdateExerciseRequest updateExerciseRequest, CancellationToken cancellationToken = default)
+    {
+        var result = await _mediator.Send(new UpdateExerciseCommand(exerciseId, updateExerciseRequest), cancellationToken);
+        return Ok(result);
+    }
+    //DELETE {id}
+    [HttpDelete("{exerciseId:guid}")]
+    public async Task<ActionResult<ExerciseResponse>> DeleteExercise([FromRoute] Guid exerciseId,
+        CancellationToken cancellationToken = default)
+    {
+        var result = _mediator.Send(new DeleteExerciseCommand(exerciseId), cancellationToken);
+        return NoContent();
     }
 }
