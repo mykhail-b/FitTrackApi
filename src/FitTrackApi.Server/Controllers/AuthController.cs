@@ -1,9 +1,7 @@
-﻿using FitTrackApi.Application.Dto.ApiResponses;
-using FitTrackApi.Application.Dto.Auth;
-using FitTrackApi.Infrastructure.IdentityEntity;
-using FitTrackApi.Infrastructure.Services;
+﻿using FitTrackApi.Server.Services.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitTrackApi.Server.Controllers;
@@ -13,11 +11,11 @@ namespace FitTrackApi.Server.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly UserManager<UserAccount> _userManager;
+    private readonly UserManager<IdentityUser> _userManager;
 
     public AuthController(
         IAuthService authService,
-        UserManager<UserAccount> userManager)
+        UserManager<IdentityUser> userManager)
     {
         _authService = authService;
         _userManager = userManager;
@@ -26,16 +24,16 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Register(
-        [FromBody] RegisterRequest request,
-        CancellationToken cancellationToken)
+    [FromBody] RegisterRequest request,
+    CancellationToken cancellationToken)
     {
         var result = await _authService.RegisterAsync(
             request,
             cancellationToken);
 
-        if (!result.Succeeded)
+        if (!result.Success)
         {
-            return BadRequest(new ApiErrorResponse(result.Error));
+            return BadRequest(new { result.Error });
         }
 
         return StatusCode(
@@ -53,9 +51,9 @@ public class AuthController : ControllerBase
             request,
             cancellationToken);
 
-        if (!result.Succeeded)
+        if (!result.Success)
         {
-            return Unauthorized(new ApiErrorResponse(result.Error));
+            return Unauthorized(new { result.Error });
         }
 
         return Ok(new { message = "Login Successful" });
@@ -81,15 +79,6 @@ public class AuthController : ControllerBase
             return Unauthorized();
         }
 
-        var response = new UserResponse(
-            user.Id,
-            user.UserName,
-            user.FullName
-        );
-
-        return Ok(new ApiSuccessResponse(
-            "User info",
-            response
-        ));
+        return Ok();
     }
 }

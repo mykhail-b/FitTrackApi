@@ -1,5 +1,5 @@
-﻿using FitTrackApi.Application.Dto.User;
-using FitTrackApi.Infrastructure.Services;
+﻿using FitTrackApi.Server.Dto.User;
+using FitTrackApi.Server.Services.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -44,7 +44,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("{userId}")]
-    public async Task<ActionResult> UpdateUserInfo(string userId, [FromBody] UserDto dto, CancellationToken ct)
+    public async Task<ActionResult> UpdateUserInfo(string userId, [FromBody] AccountDto dto, CancellationToken ct)
     {
         try
         {

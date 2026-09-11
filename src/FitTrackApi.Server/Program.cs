@@ -1,7 +1,7 @@
 using FitTrackApi.Application;
 using FitTrackApi.Infrastructure;
-using FitTrackApi.Infrastructure.Services;
 using FitTrackApi.Server.Extensions;
+using FitTrackApi.Server.Services.Infrastructure;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,12 +14,11 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.Configure<SmtpConfiguration>(builder.Configuration.GetSection("SmtpConfiguration"));
 
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddApplication();
 builder.Services.AddForwardedHeadersSetup();
 builder.Services.AddClientCors(builder.Configuration);
 builder.Services.AddAntiforgerySetup();
 builder.Services.AddCookieAuthSetup();
+builder.Services.AddServicesSetup();
 
 
 var app = builder.Build();

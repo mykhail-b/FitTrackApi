@@ -1,0 +1,67 @@
+﻿using FitTrackApi.Domain.Entity;
+using FitTrackApi.Test.Configuration;
+
+namespace FitTrackApi.Test.ServiceTest;
+
+public class ExerciseServiceTest(DatabaseFixture fixture) : IntegrationTestBase(fixture)
+{
+    private async Task<Exercise> CreateTestExerciseAsync(string name, int? id = null)
+    {
+        var exercise = new Exercise
+        {
+            Name = name,
+            Category = "Strength",
+            Images = new List<string> { $"/images/{name.ToLower().Replace(' ', '-')}.jpg" },
+            Muscles = new List<string> { "Chest" }
+        };
+
+        DbContext.Exercises.Add(exercise);
+        await DbContext.SaveChangesAsync();
+        return exercise;
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_Should_ReturnExerciseDetails_WhenExerciseExists()
+    {
+        var created = await CreateTestExerciseAsync("Push Up");
+
+        var service = new ExerciseService(UnitOfWork);
+
+        var result = await service.GetExerciseByIdAsync(created.Id, CancellationToken.None);
+
+        Assert.NotNull(result);
+        Assert.Equal("Push Up", result!.Name);
+        Assert.NotEmpty(result.Images);
+        Assert.Contains("/images/push-up.jpg", result.Images);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_Should_ReturnNull_WhenExerciseNotFound()
+    {
+        var service = new ExerciseService(UnitOfWork);
+
+        var result = await service.GetExerciseByIdAsync("some-guid-id", CancellationToken.None);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetPagedAsync_Should_ReturnPagedResults()
+    {
+        // create 15 exercises
+        for (var i = 1; i <= 15; i++)
+        {
+            await CreateTestExerciseAsync($"Exercise {i}");
+        }
+
+        var service = new ExerciseService(UnitOfWork);
+
+        var page = await service.GetExercisesAsync(2, 10, CancellationToken.None);
+
+        Assert.Equal(15, page.TotalCount);
+        Assert.Equal(2, page.PageNumber);
+        Assert.Equal(10, page.PageSize);
+        Assert.Equal(5, page.Items.Count);
+        Assert.Equal("Exercise 11", page.Items.First().Name);
+    }
+}

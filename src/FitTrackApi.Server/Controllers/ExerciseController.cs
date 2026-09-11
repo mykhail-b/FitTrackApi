@@ -1,8 +1,6 @@
 ﻿using FitTrackApi.Application.Dto;
 using FitTrackApi.Application.Dto.Exercise;
-using FitTrackApi.Application.Feature.Exercises.Commands;
-using FitTrackApi.Application.Feature.Exercises.Queries;
-using MediatR;
+using FitTrackApi.Server.Services.Public;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +11,11 @@ namespace FitTrackApi.Server.Controllers;
 [ApiController]
 public class ExerciseController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IExerciseService _service;
 
-    public ExerciseController(IMediator mediator)
+    public ExerciseController(IExerciseService service)
     {
-        _mediator = mediator;
+        _service = service;
     }
 
     // GET
@@ -27,8 +25,8 @@ public class ExerciseController : ControllerBase
         [FromQuery] int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new GetExercisePagedQuery(pageNumber, pageSize),  cancellationToken);
-        
+        var result = await _service.GetPagedAsync(pageNumber, pageSize, cancellationToken);
+
         return Ok(result);
     }
 
@@ -38,7 +36,7 @@ public class ExerciseController : ControllerBase
         [FromRoute] Guid exerciseId,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new GetExerciseByIdQuery(exerciseId), cancellationToken);
+        var result = await _service.GetByIdAsync(exerciseId, cancellationToken);
 
         return Ok(result);
     }
@@ -49,8 +47,9 @@ public class ExerciseController : ControllerBase
         [FromBody] CreateExerciseRequest createExerciseRequest, 
         CancellationToken cancellationToken = default)
     {
-        var  result = await _mediator.Send(new CreateExerciseCommand(createExerciseRequest), cancellationToken);
-        return CreatedAtAction(nameof(GetExerciseById), new { exerciseId = result.Id }, result);
+        var result = await _service.CreateAsync(createExerciseRequest, cancellationToken);
+
+        return Ok(result);
     }
     //PUT {id}
     [HttpPut("{exerciseId:guid}")]
@@ -58,7 +57,8 @@ public class ExerciseController : ControllerBase
         [FromRoute] Guid exerciseId,
         [FromBody] UpdateExerciseRequest updateExerciseRequest, CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new UpdateExerciseCommand(exerciseId, updateExerciseRequest), cancellationToken);
+        var result = await _service.UpdateAsync(exerciseId, updateExerciseRequest, cancellationToken);
+
         return Ok(result);
     }
     //DELETE {id}
@@ -66,7 +66,8 @@ public class ExerciseController : ControllerBase
     public async Task<ActionResult<ExerciseResponse>> DeleteExercise([FromRoute] Guid exerciseId,
         CancellationToken cancellationToken = default)
     {
-        var result = _mediator.Send(new DeleteExerciseCommand(exerciseId), cancellationToken);
-        return NoContent();
+        var result = await _service.DeleteAsync(exerciseId, cancellationToken);
+
+        return Ok(result);
     }
 }

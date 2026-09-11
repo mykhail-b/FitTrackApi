@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using FitTrackApi.Application.Dto;
-using FitTrackApi.Application.Feature.Workouts.Commands;
-using FitTrackApi.Application.Feature.Workouts.Queries;
-using MediatR;
+using FitTrackApi.Server.Services.Public;
 
 namespace FitTrackApi.Server.Controllers;
 
@@ -14,27 +12,29 @@ namespace FitTrackApi.Server.Controllers;
 [ApiController]
 public class WorkoutController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IWorkoutService _service;
 
-    public WorkoutController(IMediator mediator)
+    public WorkoutController(IWorkoutService service)
     {
-        _mediator = mediator;
+        _service = service;
     }
 
-    private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
+    private Guid CurrentAccountId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     [HttpGet("{workoutId:guid}")]
     public async Task<ActionResult<WorkoutDto>> GetWorkoutById(Guid workoutId, CancellationToken ct)
     {
-        var result = await _mediator.Send(new GetWorkoutByIdQuery(workoutId, CurrentUserId), ct);
+        var result = await _service.GetByIdAsync(workoutId, CurrentAccountId, ct);
         return Ok(result);
     }
 
     [HttpGet]
-    public async Task<ActionResult<PagedListResponse<WorkoutDto>>> GetWorkouts(CancellationToken ct)
+    public async Task<ActionResult<PagedListResponse<WorkoutDto>>> GetWorkouts(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        CancellationToken ct = default)
     {
-        var result = await _mediator.Send(new GetWorkoutPagedQuery(CurrentUserId), ct);
+        var result = await _service.GetPagedAsync(CurrentAccountId, pageNumber, pageSize, ct);
         return Ok(result);
     }
 
@@ -43,7 +43,7 @@ public class WorkoutController : ControllerBase
         [FromBody] CreateWorkoutRequest createWorkoutRequest,
         CancellationToken ct)
     {
-        var result = await _mediator.Send(new CreateWorkoutCommand(CurrentUserId, createWorkoutRequest), ct);
+        var result = await _service.CreateAsync(CurrentAccountId, createWorkoutRequest, ct);
         return CreatedAtAction(nameof(GetWorkoutById), new { workoutId = result.Id }, result);
     }
 
@@ -53,21 +53,21 @@ public class WorkoutController : ControllerBase
         [FromBody] UpdateWorkoutRequest updateWorkoutRequest,
         CancellationToken ct)
     {
-        await _mediator.Send(new UpdateWorkoutCommand(workoutId, CurrentUserId, updateWorkoutRequest), ct);
+        await _service.UpdateAsync(workoutId, CurrentAccountId, updateWorkoutRequest, ct);
         return NoContent();
     }
 
     [HttpGet("activity")]
     public async Task<ActionResult<List<DateOnly>>> GetWorkoutActivity(CancellationToken ct)
     {
-        var result = await _mediator.Send(new GetWorkoutActivityQuery(CurrentUserId), ct);
+        var result = await _service.GetActivityAsync(CurrentAccountId, ct);
         return Ok(result);
     }
 
     [HttpDelete("{workoutId:guid}")]
     public async Task<ActionResult> DeleteWorkout(Guid workoutId, CancellationToken ct)
     {
-        var result = await _mediator.Send(new DeleteWorkoutCommand(workoutId, CurrentUserId), ct);
+        var result = await _service.DeleteAsync(workoutId, CurrentAccountId, ct);
         return result ? Ok() : NotFound();
     }
 }
