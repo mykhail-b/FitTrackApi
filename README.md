@@ -1,14 +1,7 @@
-# 💪 Fitness Tracker API 
+# 💪 Fitness Tracker 
 
-A RESTful API for tracking workouts, exercises, and body metrics
-
-## 💡 Motivation
-
-I built FitTrack to improve my backend development skills with .NET and to have a project that reflects the kind of software I enjoy building.
-
-In the past, I started several side projects but made them too ambitious and never finished them. With FitTrack, I decided to keep the scope focused and build a complete application instead of constantly adding new features.
-
-Fitness was a natural choice because it involves real business logic, such as workout history and body metrics, while keeping the project manageable.
+A fullstack fitness tracking application built with **Vue.js** and **ASP.NET Core**. 
+Provides a RESTful API for tracking workouts, exercises, and body metrics.
 
 ## Features
 
@@ -16,29 +9,25 @@ Fitness was a natural choice because it involves real business logic, such as wo
 - Workout management
 - Exercise catalog
 - Users workout lists and activity data
-- Food catalog
+- Meals catalog
 - Cookie-based authentication
 
 ## 🔨 Tech Stack
 
 * **Backend:** ASP.NET Core Web API
+* **Frontend:** Vue.js (TypeScript, bundled with Vite)
 * **Database:** Microsoft SQL Server
 * **ORM:** Entity Framework Core
 * **Authentication:** ASP.NET Core Identity
 * **Authorization:** Cookie Authentication (HttpOnly Cookies)
 * **API Documentation:** Scalar
+* **Unit Tests:** xUnit
 
 ## Architecture
 
-The solution is organized into the following projects:
-
-- **FitTrackApi.Server** — ASP.NET Core Web API entry point. Contains controllers, dependency injection configuration, middleware, and application startup.
-
-- **FitTrackApi.Application** — Contains business logic, CQRS service used by MediatR, DTOs, mappers, and interfaces implemented by the Infrastructure layer.
-
-- **FitTrackApi.Domain** — Contains domain entities and core domain models shared across the application.
-
-- **FitTrackApi.Infrastructure** — Contains data access with EF Core (`DataContext`, repositories, migrations) and infrastructure services such as ASP.NET Core Identity, email services, and other external integrations.
+The project follows a **monolithic architecture** — the frontend and backend 
+are separate applications, but the backend itself is a single ASP.NET Core 
+Web API project without additional layer separation (no Class Library projects).
 
 ### Authentication
 
@@ -73,14 +62,14 @@ Authentication is implemented with **ASP.NET Core Identity** using **HttpOnly au
 | PUT | `/api/v1/exercise/{exerciseId}` | Update an exercise |
 | DELETE | `/api/v1/exercise/{exerciseId}` | Delete an exercise |
  
-### Food
+### Meal
 | Method | Endpoint | Description |
 |--------|----------|--------------|
-| GET | `/api/v1/food?pageNumber=1&pageSize=10` | Get paged list of food items |
-| GET | `/api/v1/food/{foodId}` | Get food item details |
-| POST | `/api/v1/food` | Create a new food item |
-| PUT | `/api/v1/food/{foodId}` | Update a food item |
-| DELETE | `/api/v1/food/{foodId}` | Delete a food item |
+| GET | `/api/v1/meal?pageNumber=1&pageSize=10` | Get paged list of food items |
+| GET | `/api/v1/meal/{mealId}` | Get food item details |
+| POST | `/api/v1/meal` | Create a new food item |
+| PUT | `/api/v1/meal/{mealId}` | Update a food item |
+| DELETE | `/api/v1/meal/{mealId}` | Delete a food item |
  
 ### Workouts
 | Method | Endpoint | Description |
@@ -95,7 +84,7 @@ Authentication is implemented with **ASP.NET Core Identity** using **HttpOnly au
 ## 🚀 Getting started 
 ### Prerequisites
 - .NET 10 SDK
-- Microsoft SQL Server (Express, LocalDB, or full edition — any works for local development)
+- Microsoft SQL Server (Express, LocalDB)
 
 ### Setup
 
