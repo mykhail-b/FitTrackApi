@@ -14,7 +14,7 @@ namespace FitTrackApi.Server.Extensions
 
             services.AddScoped<IMealService, MealService>();
             services.AddScoped<IWorkoutService, WorkoutService>();
-            services.AddScoped<IExerciseService, IExerciseService>();
+            services.AddScoped<IExerciseService, ExerciseService>();
 
             return services;
         }

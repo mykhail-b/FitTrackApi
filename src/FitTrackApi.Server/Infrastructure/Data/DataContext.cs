@@ -6,12 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FitTrackApi.Infrastructure.Data;
 
-public class DataContext : IdentityDbContext
+public class DataContext : IdentityDbContext<IdentityUser>
 {
     public DataContext(DbContextOptions<DataContext> options)
     : base(options)
     {
     }
+
+
 
     public DbSet<Account> Accounts { get; set; }
 
@@ -31,7 +33,7 @@ public class DataContext : IdentityDbContext
                 .IsRequired();
 
         modelBuilder.Entity<Workout>()
-            .HasOne<Account>()
+            .HasOne(e => e.Account)
             .WithMany(a => a.Workouts)
             .HasForeignKey(w => w.AccountId)
             .IsRequired()
@@ -39,9 +41,9 @@ public class DataContext : IdentityDbContext
 
         // Account → Meals (1:N)
         modelBuilder.Entity<Meal>()
-            .HasOne<Account>()
+            .HasOne(e => e.Account)
             .WithMany(a => a.Meals)
-            .HasForeignKey(m => m.ProfileId)
+            .HasForeignKey(m => m.AccountId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
